@@ -6,8 +6,12 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.data_loader import DataLoader
-from src.evaluate import Evaluator
 from src.forecast import Forecaster
+
+try:
+    from src.evaluate import Evaluator
+except Exception:
+    Evaluator = None
 
 ROOT_DIR = Path(__file__).resolve().parent
 ASSET_PATH = ROOT_DIR / "assets" / "201623.png"
@@ -75,12 +79,17 @@ tab1, tab2 = st.tabs(["🚀 Model Performance", "🔎 Exploratory Data Analysis"
  
 with tab1:
     st.subheader("Model Accuracy Metrics")
-    mae, mse, rmse = Evaluator().evaluate()
-   
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Mean Absolute Error (MAE)", f"{mae:.2f}", delta_color="normal")
-    m2.metric("Mean Squared Error (MSE)", f"{mse:.2f}", delta_color="inverse")
-    m3.metric("Root Mean Squared Error (RMSE)", f"{rmse:.2f}", delta_color="inverse")
+    if Evaluator is None:
+        st.info("Model evaluation is unavailable in this deployment environment because the TensorFlow-based evaluation path could not be imported.")
+    else:
+        try:
+            mae, mse, rmse = Evaluator().evaluate()
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Mean Absolute Error (MAE)", f"{mae:.2f}", delta_color="inverse")
+            m2.metric("Mean Squared Error (MSE)", f"{mse:.2f}", delta_color="inverse")
+            m3.metric("Root Mean Squared Error (RMSE)", f"{rmse:.2f}", delta_color="inverse")
+        except Exception as exc:
+            st.warning(f"Evaluation could not be completed: {exc}")
  
 with tab2:
     col_a, col_b = st.columns([1, 2])
