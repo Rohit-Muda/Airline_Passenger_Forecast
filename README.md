@@ -31,12 +31,31 @@ This project builds a simple Streamlit app for forecasting future airline passen
 This app is ready for Streamlit Cloud or similar hosting platforms.
 
 Make sure the repository contains:
-- app.py
-- requirements.txt
-- data/airline_passengers.csv
-- models/lstm_model.keras
-- models/scaler.pkl
+- `app.py`
+- `requirements.txt`
+- `data/airline_passengers.csv`
+- `models/lstm_model.keras`
+- `models/scaler.pkl`
+
+## Render Deployment
+If you want to deploy on Render, use the included `render.yaml` file. Render will install dependencies from `requirements.txt` and run:
+
+```bash
+streamlit run app.py --server.port $PORT
+```
+
+## Vercel Deployment
+If you want to deploy on Vercel, use the included `vercel.json` file. Vercel will use the Python builder for `app.py` and serve the Streamlit app as a Python endpoint.
+
+## Docker Deployment
+A `Dockerfile` is included for container deployment. Build and run locally with:
+
+```bash
+docker build -t airline-passenger-forecast .
+docker run -p 8080:8080 airline-passenger-forecast
+```
 
 ## Notes
 - The app uses the existing forecasting pipeline from the project source code.
-- For best deployment results, install the dependencies listed in requirements.txt before launching the app.
+- If the hosted environment cannot import TensorFlow-backed modules, the app will still start and show an informative fallback message.
+- Keep `models/lstm_model.keras` and `models/scaler.pkl` in the repo for prediction support.
