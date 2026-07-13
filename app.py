@@ -6,7 +6,11 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.data_loader import DataLoader
-from src.forecast import Forecaster
+
+try:
+    from src.forecast import Forecaster
+except Exception:
+    Forecaster = None
 
 try:
     from src.evaluate import Evaluator
@@ -114,6 +118,10 @@ st.markdown("---")
 st.header("🔮 Generate Future Forecast")
  
 if st.button("Run RNN Model"):
+    if Forecaster is None:
+        st.error("Forecasting is unavailable because the TensorFlow-backed module could not be imported in this environment.")
+        st.stop()
+
     with st.spinner("Analyzing temporal patterns..."):
         forecaster = Forecaster()
         future = forecaster.forecast(future_months)
@@ -124,17 +132,17 @@ if st.button("Run RNN Model"):
             periods=future_months,
             freq="MS"
         )
- 
+
         forecast_df = pd.DataFrame({
             "Month": future_dates,
             "Predicted Passengers": future.flatten()
         })
- 
+
     st.success(f"Successfully generated forecast for {future_months} months!")
- 
+
     # Layout for Results
     res_col1, res_col2 = st.columns([1, 2])
- 
+
     with res_col1:
         st.subheader("Forecasted Values")
         st.dataframe(forecast_df, width="stretch")
@@ -146,7 +154,7 @@ if st.button("Run RNN Model"):
             file_name="forecast_results.csv",
             mime="text/csv"
         )
- 
+
     with res_col2:
         st.subheader("Combined Projection")
        
