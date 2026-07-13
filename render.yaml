@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: airline-passenger-forecast
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run app.py --server.port $PORT
-    plan: starter
